@@ -8,16 +8,25 @@ import cv2
 note_files = [
     "template/c.png", 
     "template/d.png",
-		"template/e.png", 
+    "template/e.png", 
     "template/f.png",
-		"template/g.png",
-		"template/a.png", 
+    "template/g.png",
+    "template/a.png", 
     "template/b.png"]
 
-images = [  
-    "scale.png"
-]
+n = [
+	'c',
+	'd',
+	'e',
+	'f',
+	'g',
+	'a',
+	'b']
 
+
+image = cv2.imread("test.png")
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+i = 0
 for t in note_files:
   # load the image image, convert it to grayscalse, and detect edges
   template = cv2.imread(t)
@@ -28,8 +37,6 @@ for t in note_files:
   # loop over the images to find the template in
   # load the image, convert it to grayscale, and initialize the
   # bookkeeping variable to keep track of the matched region
-  image = cv2.imread("scale.png")
-  gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
   found = None
 
   # loop over the scales of the image
@@ -63,5 +70,8 @@ for t in note_files:
 
   # draw a bounding box around the detected result and display the image
   image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
-  cv2.imshow("Image", image)
-  cv2.waitKey(0)
+  cv2.putText(image, n[i], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
+  i = i + 1
+
+  
+cv2.imwrite("result.png", image)
