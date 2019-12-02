@@ -4,20 +4,30 @@ import argparse
 import imutils
 import glob
 import cv2
+import sys
+import subprocess
+
+def open_file(path):
+  cmd = {'linux':'eog', 'win32':'explorer', 'darwin':'open'}[sys.platform]
+  subprocess.run([cmd, path])
 
 # templates list
 note_files = [
-    "template/f.png"]
+    "template/d4_3.png",
+    "template/e4_1.png",
+    "template/f4_1.png",
+    "template/g4_1.png",
+    "template/c5_1_half.png",
+    "template/d5_1.png",]
 
 # description of templates above
 n = [
-	'c',
-	'd',
-	'e',
-	'f',
-	'g',
-	'a',
-	'b']
+  'd4',
+	'e4',
+	'f4',
+	'g4',
+  'c5',
+  'd5',]
 
 # image being analyzed
 image = cv2.imread("images/test.png")
@@ -71,3 +81,4 @@ for t in note_files:
     cv2.putText(image, n[i], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
   i = i + 1
 cv2.imwrite("multi-result.png", image)
+open_file('multi-result.png')
