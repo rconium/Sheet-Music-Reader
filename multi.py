@@ -14,7 +14,7 @@ def open_file(path):
 # templates list
 note_files = [
     "template/beam_c4_2_d4_quarter_e4_1.png",
-    "template/beam_a4_1_half_b4_quarter_a4_1.png",
+    "template/beam_a4_1half_b4_quarter_a4_1.png",
     "template/b3_1.png",
     "template/c4_half.png",
     "template/d4_3.png",
@@ -24,7 +24,7 @@ note_files = [
     "template/f4_1.png",
     "template/g4_1.png",
     "template/g4_half.png",
-    "template/c5_1_half.png",
+    "template/c5_1half.png",
     "template/d5_1.png",]
 
 # description of templates above
@@ -40,16 +40,22 @@ n = [
 	'f4_1',
   'g4_1',
 	'g4_half',
-  'c5_1_half',
+  'c5_1half',
   'd5_1',]
+
 
 # image being analyzed
 image = cv2.imread("images/test.png")
+row, col = image.shape[:2]
+# temp = [None] * height * width
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
+note_locations = {}
+
 # index for template descriptors
-i = 0
+# i = 0
 for t in note_files:
+  output = []
   # get note, pitch, and beat
   file_name = t.split("/")[1].split(".")[0]
   beam_check = file_name.split("_")
@@ -57,14 +63,32 @@ for t in note_files:
   if beam_check[0] != "beam":
     note = file_name.split("_")[0][0]
     pitch = file_name.split("_")[0][1]
-    beat = file_name[2].split("_")[1]
+    beat = file_name.split("_")[1]
 
     if beat == "half":
-      beat = 0.5
-    else:
-      beat = double(beat)
+      beat = "0.5"
+    elif beat == "1half":
+      beat = "1.5"
+    elif beat == "quarter":
+      beat = "0.25"
+
+    output.append([note, pitch, beat])
+    
   else:
-    file_name
+    size = len(beam_check)
+    for i in range(1, size, int((size-1)/3)):
+      note = beam_check[i][0]
+      pitch = beam_check[i][1]
+      beat = beam_check[i + 1]
+
+      if beat == "half":
+        beat = "0.5"
+      elif beat == "1half":
+        beat = "1.5"
+      elif beat == "quarter":
+        beat = "0.25"
+
+      output.append([note, pitch, beat])
 
 
   # load the image image, convert it to grayscalse
@@ -102,14 +126,31 @@ for t in note_files:
   # unpack the bookkeeping variable and compute the (x, y) coordinates
   # of the bounding box based on the resized ratio
   (_, maxLoc, r, loc) = found
-  
+
   for (x,y) in zip(loc[1], loc[0]):
     (startX, startY) = (int(x * r), int(y * r))
     (endX, endY) = (int((x + tW) * r), int((y + tH) * r))
 
     # draw a bounding box around the detected result and display the image
     image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
-    cv2.putText(image, n[i], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
-  i = i + 1
+    cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
+    note_locations[str((x,y))] = output
+  # i = i + 1
+# note_locations = list(filter(None, temp))
+breakpoint()
+
+outputFile = open('notes.txt', "w")
+
+keys = note_locations.keys()
+
+for i in range(1, row, 1):
+  for j in range(1, col, 1):
+    curr = ('(' + str(j) + ', ' + str(i) + ')')
+
+    if curr in keys:
+      print(curr)
+      print(note_locations[curr])
+
 cv2.imwrite("multi-result.png", image)
 open_file('multi-result.png')
+outputFile.close()
