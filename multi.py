@@ -7,14 +7,27 @@ import cv2
 import sys
 import subprocess
 
+
 def open_file(path):
   cmd = {'linux':'eog', 'win32':'explorer', 'darwin':'open'}[sys.platform]
   subprocess.run([cmd, path])
+
+def sort_keyval(x):
+  if (x[1] <= row/4):
+    return row/4 + x[0]
+  elif (x[1] <= row/2):
+    return row/2 + x[0]
+  elif (x[1] <= 3*row/4):
+    return 3*row/4 + x[0]
+  else:
+    return row + x[0]
+
 
 # templates list
 note_files = [
     "template/beam_c4_2_d4_quarter_e4_1.png",
     "template/beam_a4_1half_b4_quarter_a4_1.png",
+    "template/beam_d4_75_c4_quarter_d4_half.png",
     "template/b3_1.png",
     "template/c4_half.png",
     "template/d4_3.png",
@@ -134,23 +147,35 @@ for t in note_files:
     # draw a bounding box around the detected result and display the image
     image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
     cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
-    note_locations[str((x,y))] = output
+    note_locations[(startX,startY)] = output
   # i = i + 1
 # note_locations = list(filter(None, temp))
 breakpoint()
 
-outputFile = open('notes.txt', "w")
+# outputFile = open('notes.txt', "w")
 
-keys = note_locations.keys()
+keys = list(note_locations.keys())
 
-for i in range(1, row, 1):
-  for j in range(1, col, 1):
-    curr = ('(' + str(j) + ', ' + str(i) + ')')
+keys = sorted(keys, key = sort_keyval)
 
-    if curr in keys:
-      print(curr)
-      print(note_locations[curr])
+print(keys)
 
+
+for i in range(0, len(keys), 1):
+  print(note_locations[keys[i]])
+
+# for i in range(1, row, 1):
+#   for j in range(1, col, 1):
+#     curr = ('(' + str(j) + ', ' + str(i) + ')')
+
+#     if curr in keys:
+#       print(curr)
+#       print(note_locations[curr])
+
+cv2.line(image, (0, int(row/4)) , (col, int(row/4)), (255, 0, 0))
+cv2.line(image, (0, int(row/2)) , (col, int(row/2)), (255, 0, 0))
+cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (255, 0, 0))
+cv2.rectangle(image, (0, int(row/4)), (col, int(3*row/4)), (0, 255, 255), 2)
 cv2.imwrite("multi-result.png", image)
-open_file('multi-result.png')
-outputFile.close()
+# open_file('multi-result.png')
+# outputFile.close() 
