@@ -13,21 +13,35 @@ def open_file(path):
 
 # templates list
 note_files = [
+    "template/beam_c4_2_d4_quarter_e4_1.png",
+    "template/beam_a4_1_half_b4_quarter_a4_1.png",
+    "template/b3_1.png",
+    "template/c4_half.png",
     "template/d4_3.png",
+    "template/d4_half.png",
     "template/e4_1.png",
+    "template/e4_half.png",
     "template/f4_1.png",
     "template/g4_1.png",
+    "template/g4_half.png",
     "template/c5_1_half.png",
     "template/d5_1.png",]
 
 # description of templates above
 n = [
-  'd4',
-	'e4',
-	'f4',
-	'g4',
-  'c5',
-  'd5',]
+  'beam_cde4',
+  'beam_aba4',
+  'b3_1',
+  'c4_half',
+  'd4_3',
+  'd4_half',
+	'e4_1',
+  'e4_half',
+	'f4_1',
+  'g4_1',
+	'g4_half',
+  'c5_1_half',
+  'd5_1',]
 
 # image being analyzed
 image = cv2.imread("images/test.png")
@@ -36,6 +50,23 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 # index for template descriptors
 i = 0
 for t in note_files:
+  # get note, pitch, and beat
+  file_name = t.split("/")[1].split(".")[0]
+  beam_check = file_name.split("_")
+
+  if beam_check[0] != "beam":
+    note = file_name.split("_")[0][0]
+    pitch = file_name.split("_")[0][1]
+    beat = file_name[2].split("_")[1]
+
+    if beat == "half":
+      beat = 0.5
+    else:
+      beat = double(beat)
+  else:
+    file_name
+
+
   # load the image image, convert it to grayscalse
   template = cv2.imread(t, 0)
   (tH, tW) = template.shape[:2]
