@@ -6,10 +6,13 @@ import glob
 import cv2
 import sys
 import subprocess
+<<<<<<< HEAD
 import os
 from midiutil.MidiFile3 import MIDIFile
 
 notesList = []
+=======
+>>>>>>> richard
 
 # open image files
 def open_file(path):
@@ -30,9 +33,26 @@ def sort_keyval(x):
 
 # templates list
 note_files = [
+<<<<<<< HEAD
     "template/beam_c4_75_d4_quarter_e4_1.png",
     "template/beam_a4_1half_b4_quarter_a4_1.png",
     "template/beam_d4_75_c4_quarter_d4_half.png",
+=======
+    "template/beam_a4_150_e4_quarter_d4_half.png",
+    "template/beam_c4_75_d4_quarter_e4_half.png",
+    "template/beam_c4_75_d4_25_e4_half.png",
+    "template/beam_a4_1half_b4_quarter_a4_half.png",
+    "template/beam_a4_150_b4_quarter_a4_half.png",
+    "template/beam_d4_75_c4_quarter_d4_half.png",
+    "template/beam_c5_75_b4_25_c5_half.png",
+    "template/beam_c5_1half_b4_quarter_a4_half.png",
+    "template/beam_c5_150_b4_quarter_a4_half.png",
+    "template/beam_c4_75_d4_25_e4_50.png",
+    "template/beam_c4_75_d4_quarter_e4_50.png",
+    "template/beam_a4_150_e4_quarter_d4_50.png",
+    "template/beam_d4_75_c4_quarter_d4_50.png",
+    "template/beam_c5_75_b4_25_c5_50.png",
+>>>>>>> richard
     "template/b3_1.png",
     "template/c4_half.png",
     "template/d4_3.png",
@@ -45,6 +65,7 @@ note_files = [
     "template/c5_1half.png",
     "template/d5_1.png",]
 
+<<<<<<< HEAD
 note_defs = {
      "g5" : (79),
      "f5" : (77),
@@ -90,21 +111,30 @@ def SelectFile(defaultFile):
 
 # image being analyzed
 image = cv2.imread(SelectFile("images/test.png"))
+=======
+# image being analyzed
+image = cv2.imread("images/test.png")
+>>>>>>> richard
 row, col = image.shape[:2]
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 note_locations = {}
 
+<<<<<<< HEAD
 print("\nLoading.......")
 
 for t in note_files:
   
+=======
+for t in note_files:
+>>>>>>> richard
   output = []
   # get note, pitch, and beat
   file_name = t.split("/")[1].split(".")[0]
   beam_check = file_name.split("_")
 
   if beam_check[0] != "beam":
+<<<<<<< HEAD
     note = beam_check[0]
     pitch = note_defs[note]
     beat = file_name.split("_")[1]
@@ -114,6 +144,17 @@ for t in note_files:
     elif beat == "1half":
       beat = "1.5"
     elif beat == "quarter":
+=======
+    note = file_name.split("_")[0][0]
+    pitch = file_name.split("_")[0][1]
+    beat = file_name.split("_")[1]
+
+    if beat == "half" or beat == "50":
+      beat = "0.5"
+    elif beat == "1half" or beat == "150":
+      beat = "1.5"
+    elif beat == "quarter" or beat == "25":
+>>>>>>> richard
       beat = "0.25"
     elif beat == "75":
       beat = "0.75"
@@ -127,11 +168,19 @@ for t in note_files:
       pitch = beam_check[i][1]
       beat = beam_check[i + 1]
 
+<<<<<<< HEAD
       if beat == "half":
         beat = "0.5"
       elif beat == "1half":
         beat = "1.5"
       elif beat == "quarter":
+=======
+      if beat == "half" or beat == "50":
+        beat = "0.5"
+      elif beat == "1half" or beat == "150":
+        beat = "1.5"
+      elif beat == "quarter" or beat == "25":
+>>>>>>> richard
         beat = "0.25"
       elif beat == "75":
         beat = "0.75"
@@ -192,7 +241,10 @@ for t in note_files:
     # else:
     #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (255, 0, 0), 2)
     image = cv2.rectangle(image, (startX, startY), (endX, endY), (100, int(color[1]), int(color[2])), 2)
+<<<<<<< HEAD
 
+=======
+>>>>>>> richard
     cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
     note_locations[(startX,startY,endX,endY)] = output
 # breakpoint()
@@ -218,10 +270,14 @@ for i in range(0, len(keys), 1):
       continue
     else:
       prev = note_locations[keys[i]]
+<<<<<<< HEAD
   #print(note_locations[keys[i]])
   outputFile.write(str(note_locations[keys[i]]) + "\n")
   notesList.append(note_locations[keys[i]])
 
+=======
+  print(note_locations[keys[i]])
+>>>>>>> richard
 
 cv2.line(image, (0, int(row/4)) , (col, int(row/4)), (0, 0, 255))
 cv2.line(image, (0, int(row/2)) , (col, int(row/2)), (0, 0, 255))
@@ -232,6 +288,7 @@ cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (0, 0, 255))
 
 cv2.imwrite("multi-result.png", image)
 open_file('multi-result.png')
+<<<<<<< HEAD
 outputFile.close() 
 
 midi = MIDIFile(1)
@@ -261,3 +318,6 @@ midi.addNote(track,channel,pitch,time,4,0)
 binfile = open("music.mid", 'wb')
 midi.writeFile(binfile)
 binfile.close()
+=======
+outputFile.close() 
+>>>>>>> richard
