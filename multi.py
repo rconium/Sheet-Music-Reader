@@ -45,6 +45,31 @@ note_files = [
     "template/c5_1half.png",
     "template/d5_1.png",]
 
+note_defs = {
+     "g5" : (79),
+     "f5" : (77),
+     "e5" : (76),
+     "d5" : (74),
+     "c5" : (72),
+     "b4" : (71),
+     "a4" : (69),
+     "g4" : (67),
+     "f4" : (65),
+     "e4" : (64),
+     "d4" : (62),
+     "c4" : (60),
+     "b3" : (59),
+     "a3" : (57),
+     "g3" : (55),
+     "f3" : (53),
+     "e3" : (52),
+     "d3" : (50),
+     "c3" : (48),
+     "b2" : (47),
+     "a2" : (45),
+     "f2" : (53),
+}
+
 # Function: Read take and return the input file
 def SelectFile(defaultFile):
     script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
@@ -80,8 +105,8 @@ for t in note_files:
   beam_check = file_name.split("_")
 
   if beam_check[0] != "beam":
-    note = file_name.split("_")[0][0]
-    pitch = file_name.split("_")[0][1]
+    note = beam_check[0]
+    pitch = note_defs[note]
     beat = file_name.split("_")[1]
 
     if beat == "half":
