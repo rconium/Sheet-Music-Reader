@@ -9,25 +9,11 @@ import subprocess
 import os
 from midiutil.MidiFile3 import MIDIFile
 
+#list contains all the notes
 notesList = []
 
-
-# open image files
-def open_file(path):
-  cmd = {'linux':'eog', 'win32':'explorer', 'darwin':'open'}[sys.platform]
-  subprocess.run([cmd, path])
-
-# sorts coordinates from top left to bottom right.
-# uses the sections of each staves as reference to generate the 'location' of the note.
-def sort_keyval(x):
-  if (x[1] <= row/4):
-    return (col) + x[0]
-  elif (x[1] <= row/2):
-    return (col*2) + x[0]
-  elif (x[1] <= 3*row/4):
-    return (col*3) + x[0]
-  else:
-    return (col*4) + x[0]
+#list contains all the notes locations
+note_locations = {}
 
 # templates list
 note_files = [
@@ -57,6 +43,7 @@ note_files = [
     "template/c5_1half.png",
     "template/d5_1.png",]
 
+# Notes types and pitch dictionary 
 note_defs = {
      "g5" : (79),
      "f5" : (77),
@@ -82,6 +69,28 @@ note_defs = {
      "f2" : (53),
 }
 
+#----------------------------------------------------------------------------------------------------------#
+# Function:
+# open image files
+def open_file(path):
+  cmd = {'linux':'eog', 'win32':'explorer', 'darwin':'open'}[sys.platform]
+  subprocess.run([cmd, path])
+
+#----------------------------------------------------------------------------------------------------------#
+# Function: 
+# sorts coordinates from top left to bottom right.
+# uses the sections of each staves as reference to generate the 'location' of the note.
+def sort_keyval(x):
+  if (x[1] <= row/4):
+    return (col) + x[0]
+  elif (x[1] <= row/2):
+    return (col*2) + x[0]
+  elif (x[1] <= 3*row/4):
+    return (col*3) + x[0]
+  else:
+    return (col*4) + x[0]
+
+#----------------------------------------------------------------------------------------------------------#
 # Function: Read take and return the input file
 def SelectFile(defaultFile):
     script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
@@ -100,14 +109,15 @@ def SelectFile(defaultFile):
             else:
                 return userInput
 
-# image being analyzed
+# read image from selected image
 image = cv2.imread(SelectFile("images/test.png"))
+
+# image being analyzed
 row, col = image.shape[:2]
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-note_locations = {}
+print("\nLoading.......\n")
 
-print("\nLoading.......")
 
 for t in note_files:
   output = []
@@ -194,14 +204,6 @@ for t in note_files:
     (endX, endY) = (int((x + tW) * r), int((y + tH) * r))
 
     # draw a bounding box around the detected result and display the image
-    # if (startY <= row/4):
-    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 255, 0), 2)
-    # elif (startY <= row/2):
-    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 255, 255), 2)
-    # elif (startY <= 3*row/4):
-    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (255, 0, 255), 2)
-    # else:
-    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (255, 0, 0), 2)
     image = cv2.rectangle(image, (startX, startY), (endX, endY), (100, int(color[1]), int(color[2])), 2)
 
     cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
@@ -232,6 +234,7 @@ for i in range(0, len(keys), 1):
 
   #print(note_locations[keys[i]])
   outputFile.write(str(note_locations[keys[i]]) + "\n")
+  #make a list of all notes
   notesList.append(note_locations[keys[i]])
 
 
@@ -242,34 +245,52 @@ cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (0, 0, 255))
 # DEBUGGING: Show this certain box as yellow
 # image = cv2.rectangle(image, (keys[3][0], keys[3][1]), (keys[3][2], keys[3][3]), (0, 255, 255), 2)
 
+# create image file 
 cv2.imwrite("multi-result.png", image)
 open_file('multi-result.png')
 outputFile.close() 
 
+print("\nMaking midi music file.......\n")
+#----------------------------------------------------------------------------------------------------------#
+# Output the notes as midi file.
+
+# Create the MIDIFile Object with 1 track
 midi = MIDIFile(1)
-     
-track = 0   
+ 
+# the first track is 0, here we only need one
+track = 0  
 time = 0
 channel = 0
+
+# Use constant volume for all notes
 volume = 100
     
+# Add track name and tempo.
 midi.addTrackName(track, time, "Track")
 midi.addTempo(track, time, 140)
 
+# loop over notes and add the note
 for note in notesList:
+
+    #check if the note is beam
     if len(note) > 1:
         print("beam -_- ")
 
     else:
+        #Get the duration time or beat and get the picth
         duration = float(note[0][2])
         pitch = int(note[0][1])
+
+        #add the note to midi object.
         midi.addNote(track,channel,pitch,time,duration,volume)
+
+        #incremnt the time by duration time to add new note and play the notes in order  
         time += duration
 
 #insert sound with volume 0 after the music
 midi.addNote(track,channel,pitch,time,4,0)
 
-# And write it to disk.
+# Create midi music file
 binfile = open("music.mid", 'wb')
 midi.writeFile(binfile)
 binfile.close()
