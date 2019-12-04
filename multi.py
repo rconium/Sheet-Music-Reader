@@ -6,6 +6,10 @@ import glob
 import cv2
 import sys
 import subprocess
+import os
+from midiutil.MidiFile3 import MIDIFile
+
+notesList = []
 
 # open image files
 def open_file(path):
@@ -41,14 +45,35 @@ note_files = [
     "template/c5_1half.png",
     "template/d5_1.png",]
 
+# Function: Read take and return the input file
+def SelectFile(defaultFile):
+    script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
+    # Select  file, default is prog.asm
+    while True:
+        cktFile = defaultFile
+        print("\nEnter an Image File or Press Enter to Select the Defaul Image (" + str(cktFile) + ")")
+        userInput = input()
+        if userInput == "":
+            userInput = defaultFile
+            return userInput
+        else:
+            cktFile = os.path.join(script_dir, userInput)
+            if not os.path.isfile(cktFile):
+                print("File does not exist. \n")
+            else:
+                return userInput
+
 # image being analyzed
-image = cv2.imread("images/test.png")
+image = cv2.imread(SelectFile("images/test.png"))
 row, col = image.shape[:2]
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 note_locations = {}
 
+print("\nLoading.......")
+
 for t in note_files:
+  
   output = []
   # get note, pitch, and beat
   file_name = t.split("/")[1].split(".")[0]
@@ -168,7 +193,10 @@ for i in range(0, len(keys), 1):
       continue
     else:
       prev = note_locations[keys[i]]
-  print(note_locations[keys[i]])
+  #print(note_locations[keys[i]])
+  outputFile.write(str(note_locations[keys[i]]) + "\n")
+  notesList.append(note_locations[keys[i]])
+
 
 cv2.line(image, (0, int(row/4)) , (col, int(row/4)), (0, 0, 255))
 cv2.line(image, (0, int(row/2)) , (col, int(row/2)), (0, 0, 255))
@@ -180,3 +208,31 @@ cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (0, 0, 255))
 cv2.imwrite("multi-result.png", image)
 open_file('multi-result.png')
 outputFile.close() 
+
+midi = MIDIFile(1)
+     
+track = 0   
+time = 0
+channel = 0
+volume = 100
+    
+midi.addTrackName(track, time, "Track")
+midi.addTempo(track, time, 140)
+
+for note in notesList:
+    if len(note) > 1:
+        print("beam -_- ")
+
+    else:
+        duration = float(note[0][2])
+        pitch = int(note[0][1])
+        midi.addNote(track,channel,pitch,time,duration,volume)
+        time += duration
+
+#insert sound with volume 0 after the music
+midi.addNote(track,channel,pitch,time,4,0)
+
+# And write it to disk.
+binfile = open("music.mid", 'wb')
+midi.writeFile(binfile)
+binfile.close()
