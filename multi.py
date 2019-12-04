@@ -33,6 +33,13 @@ note_files = [
     "template/beam_a4_150_b4_quarter_a4_half.png",
     "template/beam_d4_75_c4_quarter_d4_half.png",
     "template/beam_c5_75_b4_25_c5_half.png",
+    "template/beam_c5_1half_b4_quarter_a4_half.png",
+    "template/beam_c5_150_b4_quarter_a4_half.png",
+    "template/beam_c4_75_d4_25_e4_50.png",
+    "template/beam_c4_75_d4_quarter_e4_50.png",
+    "template/beam_a4_150_e4_quarter_d4_50.png",
+    "template/beam_d4_75_c4_quarter_d4_50.png",
+    "template/beam_c5_75_b4_25_c5_50.png",
     "template/b3_1.png",
     "template/c4_half.png",
     "template/d4_3.png",
@@ -63,7 +70,7 @@ for t in note_files:
     pitch = file_name.split("_")[0][1]
     beat = file_name.split("_")[1]
 
-    if beat == "half":
+    if beat == "half" or beat == "50":
       beat = "0.5"
     elif beat == "1half" or beat == "150":
       beat = "1.5"
@@ -81,11 +88,11 @@ for t in note_files:
       pitch = beam_check[i][1]
       beat = beam_check[i + 1]
 
-      if beat == "half":
+      if beat == "half" or beat == "50":
         beat = "0.5"
-      elif beat == "1half":
+      elif beat == "1half" or beat == "150":
         beat = "1.5"
-      elif beat == "quarter":
+      elif beat == "quarter" or beat == "25":
         beat = "0.25"
       elif beat == "75":
         beat = "0.75"
