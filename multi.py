@@ -7,25 +7,26 @@ import cv2
 import sys
 import subprocess
 
-
+# open image files
 def open_file(path):
   cmd = {'linux':'eog', 'win32':'explorer', 'darwin':'open'}[sys.platform]
   subprocess.run([cmd, path])
 
+# sorts coordinates from top left to bottom right.
+# uses the sections of each staves as reference to generate the 'location' of the note.
 def sort_keyval(x):
   if (x[1] <= row/4):
-    return row/4 + x[0]
+    return (col) + x[0]
   elif (x[1] <= row/2):
-    return row/2 + x[0]
+    return (col*2) + x[0]
   elif (x[1] <= 3*row/4):
-    return 3*row/4 + x[0]
+    return (col*3) + x[0]
   else:
-    return row + x[0]
-
+    return (col*4) + x[0]
 
 # templates list
 note_files = [
-    "template/beam_c4_2_d4_quarter_e4_1.png",
+    "template/beam_c4_75_d4_quarter_e4_1.png",
     "template/beam_a4_1half_b4_quarter_a4_1.png",
     "template/beam_d4_75_c4_quarter_d4_half.png",
     "template/b3_1.png",
@@ -40,33 +41,13 @@ note_files = [
     "template/c5_1half.png",
     "template/d5_1.png",]
 
-# description of templates above
-n = [
-  'beam_cde4',
-  'beam_aba4',
-  'b3_1',
-  'c4_half',
-  'd4_3',
-  'd4_half',
-	'e4_1',
-  'e4_half',
-	'f4_1',
-  'g4_1',
-	'g4_half',
-  'c5_1half',
-  'd5_1',]
-
-
 # image being analyzed
 image = cv2.imread("images/test.png")
 row, col = image.shape[:2]
-# temp = [None] * height * width
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 note_locations = {}
 
-# index for template descriptors
-# i = 0
 for t in note_files:
   output = []
   # get note, pitch, and beat
@@ -84,6 +65,8 @@ for t in note_files:
       beat = "1.5"
     elif beat == "quarter":
       beat = "0.25"
+    elif beat == "75":
+      beat = "0.75"
 
     output.append([note, pitch, beat])
     
@@ -100,6 +83,9 @@ for t in note_files:
         beat = "1.5"
       elif beat == "quarter":
         beat = "0.25"
+      elif beat == "75":
+        beat = "0.75"
+
 
       output.append([note, pitch, beat])
 
@@ -139,20 +125,29 @@ for t in note_files:
   # unpack the bookkeeping variable and compute the (x, y) coordinates
   # of the bounding box based on the resized ratio
   (_, maxLoc, r, loc) = found
+  color = list(np.random.choice(range(256), size=3))
 
   for (x,y) in zip(loc[1], loc[0]):
     (startX, startY) = (int(x * r), int(y * r))
+
     (endX, endY) = (int((x + tW) * r), int((y + tH) * r))
 
     # draw a bounding box around the detected result and display the image
-    image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
-    cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
-    note_locations[(startX,startY)] = output
-  # i = i + 1
-# note_locations = list(filter(None, temp))
-breakpoint()
+    # if (startY <= row/4):
+    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 255, 0), 2)
+    # elif (startY <= row/2):
+    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 255, 255), 2)
+    # elif (startY <= 3*row/4):
+    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (255, 0, 255), 2)
+    # else:
+    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (255, 0, 0), 2)
+    image = cv2.rectangle(image, (startX, startY), (endX, endY), (100, int(color[1]), int(color[2])), 2)
 
-# outputFile = open('notes.txt', "w")
+    cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
+    note_locations[(startX,startY,endX,endY)] = output
+# breakpoint()
+
+outputFile = open('notes.txt', "w")
 
 keys = list(note_locations.keys())
 
@@ -160,22 +155,28 @@ keys = sorted(keys, key = sort_keyval)
 
 print(keys)
 
-
+# get rid of duplicates
 for i in range(0, len(keys), 1):
+  if i == 0:
+    prev = note_locations[keys[i]]
+  else:
+    prev.sort()
+    note_locations[keys[i]].sort()
+
+    if prev == note_locations[keys[i]]:
+      del note_locations[keys[i]]
+      continue
+    else:
+      prev = note_locations[keys[i]]
   print(note_locations[keys[i]])
 
-# for i in range(1, row, 1):
-#   for j in range(1, col, 1):
-#     curr = ('(' + str(j) + ', ' + str(i) + ')')
+cv2.line(image, (0, int(row/4)) , (col, int(row/4)), (0, 0, 255))
+cv2.line(image, (0, int(row/2)) , (col, int(row/2)), (0, 0, 255))
+cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (0, 0, 255))
 
-#     if curr in keys:
-#       print(curr)
-#       print(note_locations[curr])
+# DEBUGGING: Show this certain box as yellow
+# image = cv2.rectangle(image, (keys[3][0], keys[3][1]), (keys[3][2], keys[3][3]), (0, 255, 255), 2)
 
-cv2.line(image, (0, int(row/4)) , (col, int(row/4)), (255, 0, 0))
-cv2.line(image, (0, int(row/2)) , (col, int(row/2)), (255, 0, 0))
-cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (255, 0, 0))
-cv2.rectangle(image, (0, int(row/4)), (col, int(3*row/4)), (0, 255, 255), 2)
 cv2.imwrite("multi-result.png", image)
-# open_file('multi-result.png')
-# outputFile.close() 
+open_file('multi-result.png')
+outputFile.close() 
