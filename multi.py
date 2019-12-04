@@ -26,9 +26,13 @@ def sort_keyval(x):
 
 # templates list
 note_files = [
-    "template/beam_c4_75_d4_quarter_e4_1.png",
-    "template/beam_a4_1half_b4_quarter_a4_1.png",
+    "template/beam_a4_150_e4_quarter_d4_half.png",
+    "template/beam_c4_75_d4_quarter_e4_half.png",
+    "template/beam_c4_75_d4_25_e4_half.png",
+    "template/beam_a4_1half_b4_quarter_a4_half.png",
+    "template/beam_a4_150_b4_quarter_a4_half.png",
     "template/beam_d4_75_c4_quarter_d4_half.png",
+    "template/beam_c5_75_b4_25_c5_half.png",
     "template/b3_1.png",
     "template/c4_half.png",
     "template/d4_3.png",
@@ -61,9 +65,9 @@ for t in note_files:
 
     if beat == "half":
       beat = "0.5"
-    elif beat == "1half":
+    elif beat == "1half" or beat == "150":
       beat = "1.5"
-    elif beat == "quarter":
+    elif beat == "quarter" or beat == "25":
       beat = "0.25"
     elif beat == "75":
       beat = "0.75"
@@ -142,7 +146,6 @@ for t in note_files:
     # else:
     #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (255, 0, 0), 2)
     image = cv2.rectangle(image, (startX, startY), (endX, endY), (100, int(color[1]), int(color[2])), 2)
-
     cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
     note_locations[(startX,startY,endX,endY)] = output
 # breakpoint()
