@@ -6,26 +6,42 @@ import glob
 import cv2
 import sys
 import subprocess
-<<<<<<< HEAD
-
-=======
 import os
 from midiutil.MidiFile3 import MIDIFile
+
+note_defs = {
+     "g5" : (79),
+     "f5" : (77),
+     -2 : ("e5", 76),
+     -1 : ("d5", 74),
+      0 : ("c5", 72),
+      1 : ("b4", 71),
+      2 : ("a4", 69),
+      3 : ("g4", 67),
+      4 : ("f4", 65),
+      5 : ("e4", 64),
+      6 : ("d4", 62),
+      7 : ("c4", 60),
+      8 : ("b3", 59),
+      9 : ("a3", 57),
+     10 : ("g3", 55),
+     11 : ("f3", 53),
+     12 : ("e3", 52),
+     13 : ("d3", 50),
+     14 : ("c3", 48),
+     15 : ("b2", 47),
+     16 : ("a2", 45),
+     17 : ("f2", 53),
+
+}
 
 notesList = []
 
 # open image files
->>>>>>> Tarek
 def open_file(path):
   cmd = {'linux':'eog', 'win32':'explorer', 'darwin':'open'}[sys.platform]
   subprocess.run([cmd, path])
 
-<<<<<<< HEAD
-# templates list
-note_files = [
-    "template/beam_c4_2_d4_quarter_e4_1.png",
-    "template/beam_a4_1half_b4_quarter_a4_1.png",
-=======
 # sorts coordinates from top left to bottom right.
 # uses the sections of each staves as reference to generate the 'location' of the note.
 def sort_keyval(x):
@@ -43,7 +59,6 @@ note_files = [
     "template/beam_c4_75_d4_quarter_e4_1.png",
     "template/beam_a4_1half_b4_quarter_a4_1.png",
     "template/beam_d4_75_c4_quarter_d4_half.png",
->>>>>>> Tarek
     "template/b3_1.png",
     "template/c4_half.png",
     "template/d4_3.png",
@@ -56,29 +71,6 @@ note_files = [
     "template/c5_1half.png",
     "template/d5_1.png",]
 
-<<<<<<< HEAD
-# description of templates above
-n = [
-  'beam_cde4',
-  'beam_aba4',
-  'b3_1',
-  'c4_half',
-  'd4_3',
-  'd4_half',
-	'e4_1',
-  'e4_half',
-	'f4_1',
-  'g4_1',
-	'g4_half',
-  'c5_1half',
-  'd5_1',]
-
-
-# image being analyzed
-image = cv2.imread("images/test.png")
-row, col = image.shape[:2]
-# temp = [None] * height * width
-=======
 # Function: Read take and return the input file
 def SelectFile(defaultFile):
     script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
@@ -100,21 +92,14 @@ def SelectFile(defaultFile):
 # image being analyzed
 image = cv2.imread(SelectFile("images/test.png"))
 row, col = image.shape[:2]
->>>>>>> Tarek
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 note_locations = {}
 
-<<<<<<< HEAD
-# index for template descriptors
-# i = 0
-for t in note_files:
-=======
 print("\nLoading.......")
 
 for t in note_files:
   
->>>>>>> Tarek
   output = []
   # get note, pitch, and beat
   file_name = t.split("/")[1].split(".")[0]
@@ -122,7 +107,7 @@ for t in note_files:
 
   if beam_check[0] != "beam":
     note = file_name.split("_")[0][0]
-    pitch = file_name.split("_")[0][1]
+    pitch = note_defs(file_name.split("_")[0][1])
     beat = file_name.split("_")[1]
 
     if beat == "half":
@@ -131,11 +116,8 @@ for t in note_files:
       beat = "1.5"
     elif beat == "quarter":
       beat = "0.25"
-<<<<<<< HEAD
-=======
     elif beat == "75":
       beat = "0.75"
->>>>>>> Tarek
 
     output.append([note, pitch, beat])
     
@@ -152,12 +134,9 @@ for t in note_files:
         beat = "1.5"
       elif beat == "quarter":
         beat = "0.25"
-<<<<<<< HEAD
-=======
       elif beat == "75":
         beat = "0.75"
 
->>>>>>> Tarek
 
       output.append([note, pitch, beat])
 
@@ -197,36 +176,6 @@ for t in note_files:
   # unpack the bookkeeping variable and compute the (x, y) coordinates
   # of the bounding box based on the resized ratio
   (_, maxLoc, r, loc) = found
-<<<<<<< HEAD
-
-  for (x,y) in zip(loc[1], loc[0]):
-    (startX, startY) = (int(x * r), int(y * r))
-    (endX, endY) = (int((x + tW) * r), int((y + tH) * r))
-
-    # draw a bounding box around the detected result and display the image
-    image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 0, 255), 2)
-    cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
-    note_locations[str((x,y))] = output
-  # i = i + 1
-# note_locations = list(filter(None, temp))
-breakpoint()
-
-outputFile = open('notes.txt', "w")
-
-keys = note_locations.keys()
-
-for i in range(1, row, 1):
-  for j in range(1, col, 1):
-    curr = ('(' + str(j) + ', ' + str(i) + ')')
-
-    if curr in keys:
-      print(curr)
-      print(note_locations[curr])
-
-cv2.imwrite("multi-result.png", image)
-open_file('multi-result.png')
-outputFile.close()
-=======
   color = list(np.random.choice(range(256), size=3))
 
   for (x,y) in zip(loc[1], loc[0]):
@@ -313,4 +262,3 @@ midi.addNote(track,channel,pitch,time,4,0)
 binfile = open("music.mid", 'wb')
 midi.writeFile(binfile)
 binfile.close()
->>>>>>> Tarek
