@@ -17,6 +17,12 @@ note_locations = {}
 
 # templates list
 note_files = [
+    "template/rest_sixteenth_quarter.png",
+    "template/rest_whole_4.png",
+    "template/rest_wholesixt_425.png",
+    "template/rest_sixteenth_25.png",
+    "template/a4_half.png",
+    "template/a4_50.png",
     "template/beam_a4_75_e4_quarter_d4_half.png",
     "template/beam_c4_75_d4_quarter_e4_half.png",
     "template/beam_c4_75_d4_25_e4_half.png",
@@ -96,15 +102,15 @@ def SelectFile(defaultFile):
     script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
     # Select  file, default is prog.asm
     while True:
-        cktFile = defaultFile
-        print("\nEnter an Image File or Press Enter to Select the Defaul Image (" + str(cktFile) + ")")
+        imgFile = defaultFile
+        print("\nEnter an Image File or Press Enter to Select the Defaul Image (" + str(imgFile) + ")")
         userInput = input()
         if userInput == "":
             userInput = defaultFile
             return userInput
         else:
-            cktFile = os.path.join(script_dir, userInput)
-            if not os.path.isfile(cktFile):
+            imgFile = os.path.join(script_dir, userInput)
+            if not os.path.isfile(imgFile):
                 print("File does not exist. \n")
             else:
                 return userInput
@@ -116,15 +122,39 @@ image = cv2.imread(SelectFile("images/test.png"))
 row, col = image.shape[:2]
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-print("\nLoading.......\n")
+print("Segmenting the image...\n")
+cv2.line(image, (0, int(row/4)) , (col, int(row/4)), (0, 0, 255))
+cv2.line(image, (0, int(row/2)) , (col, int(row/2)), (0, 0, 255))
+cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (0, 0, 255))
 
+# create image file 
+cv2.imwrite("marked_up_sheet.png", image)
+open_file('marked_up_sheet.png')
+
+print("\nLoading.......\n")
+cmd = {'linux':'eog', 'win32':'explorer', 'darwin':'open'}[sys.platform]
 for t in note_files:
   output = []
   # get note, pitch, and beat
   file_name = t.split("/")[1].split(".")[0]
   beam_check = file_name.split("_")
 
-  if beam_check[0] != "beam":
+  if beam_check[0] == "rest":
+    rest = beam_check[1]
+    pitch = 0
+    beat = beam_check[2]
+
+    if beat == "425":
+      beat = "4.25"
+    elif beat == "quarter" or beat == "25":
+      beat = "0.25"
+    elif beat == "half" or beat == "50":
+      beat = "0.5"
+    
+    output.append([rest, pitch, beat])
+    print("Detecting rest" + rest + " with beat of " + beat)
+
+  elif beam_check[0] != "beam":
     note = beam_check[0]
     pitch = note_defs[note]
     beat = file_name.split("_")[1]
@@ -139,9 +169,12 @@ for t in note_files:
       beat = "0.75"
 
     output.append([note, pitch, beat])
+    print("Detecting " + note + " with beat of " + beat)
     
   else:
     size = len(beam_check)
+    n_temp = ""
+    b_temp = ""
     for i in range(1, size, int((size-1)/3)):
       note = beam_check[i]
       pitch = note_defs[note]
@@ -155,10 +188,14 @@ for t in note_files:
         beat = "0.25"
       elif beat == "75":
         beat = "0.75"
+      
+      n_temp = n_temp + "_" + note
+      b_temp = b_temp + "_" + beat
 
       output.append([note, pitch, beat])
-
-  # load the image image, convert it to grayscalse
+    print("Detecting beam" + n_temp + " with beat of " + b_temp)
+  
+    # load the image image, convert it to grayscalse
   template = cv2.imread(t, 0)
   (tH, tW) = template.shape[:2]
 
@@ -195,6 +232,7 @@ for t in note_files:
   (_, maxLoc, r, loc) = found
   color = list(np.random.choice(range(256), size=3))
 
+  non_repeat = True
   for (x,y) in zip(loc[1], loc[0]):
     (startX, startY) = (int(x * r), int(y * r))
 
@@ -205,6 +243,13 @@ for t in note_files:
 
     cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
     note_locations[(startX,startY,endX,endY)] = output
+    if non_repeat:
+      print("...... Detected!")
+      non_repeat = False
+  
+  if not non_repeat:
+    cv2.imwrite('marked_up_sheet.png', image)
+    open_file('marked_up_sheet.png')
 # breakpoint()
 
 outputFile = open('results/notes.txt', "w")
@@ -213,6 +258,7 @@ keys = list(note_locations.keys())
 
 keys = sorted(keys, key = sort_keyval)
 
+print("\nOrdered Notes List:")
 print(keys)
 
 # get rid of duplicates
@@ -234,17 +280,12 @@ for i in range(0, len(keys), 1):
   #make a list of all notes
   notesList.append(note_locations[keys[i]])
 
-
-cv2.line(image, (0, int(row/4)) , (col, int(row/4)), (0, 0, 255))
-cv2.line(image, (0, int(row/2)) , (col, int(row/2)), (0, 0, 255))
-cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (0, 0, 255))
-
 # DEBUGGING: Show this certain box as yellow
 # image = cv2.rectangle(image, (keys[3][0], keys[3][1]), (keys[3][2], keys[3][3]), (0, 255, 255), 2)
 
 # create image file 
-cv2.imwrite("results/marked_up_sheet.png", image)
-open_file('results/marked_up_sheet.png')
+# cv2.imwrite("marked_up_sheet.png", image)
+# open_file('marked_up_sheet.png')
 outputFile.close() 
 
 print("\nMaking midi music file.......\n")
@@ -269,23 +310,12 @@ midi.addTempo(track, time, 140)
 # loop over notes and add the note
 for note in notesList:
 
-    #check if the note is beam
-    if len(note) > 1:
-        for item in note:
-            #Get the duration time or beat and get the picth
-            duration = float(item[2])
-            pitch = int(item[1])
-
-            #add the note to midi object.
-            midi.addNote(track,channel,pitch,time,duration,volume)
-
-            #incremnt the time by duration time to add new note and play the notes in order  
-            time += duration
-
-    else:
+  #check if the note is beam
+  if len(note) > 1:
+    for item in note:
         #Get the duration time or beat and get the picth
-        duration = float(note[0][2])
-        pitch = int(note[0][1])
+        duration = float(item[2])
+        pitch = int(item[1])
 
         #add the note to midi object.
         midi.addNote(track,channel,pitch,time,duration,volume)
@@ -293,11 +323,28 @@ for note in notesList:
         #incremnt the time by duration time to add new note and play the notes in order  
         time += duration
 
+  else:
+    #Get the duration time or beat and get the picth
+    duration = float(note[0][2])
+    pitch = int(note[0][1])
+
+    if note[0][0] == "sixteenth" or \
+      note[0][0] == "whole" or \
+      note[0][0] == "wholesixt":
+      midi.addNote(track,channel,pitch,time,duration,0)
+      continue
+
+    #add the note to midi object.
+    midi.addNote(track,channel,pitch,time,duration,volume)
+
+    #incremnt the time by duration time to add new note and play the notes in order  
+    time += duration
+
 #insert sound with volume 0 after the music
 midi.addNote(track,channel,pitch,time,4,0)
 
 # Create midi music file
-binfile = open("results/music.mid", 'wb')
+binfile = open("music.mid", 'wb')
 midi.writeFile(binfile)
 binfile.close()
-
+open_file('music.mid')
