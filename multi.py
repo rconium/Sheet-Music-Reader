@@ -118,7 +118,6 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 print("\nLoading.......\n")
 
-
 for t in note_files:
   output = []
   # get note, pitch, and beat
@@ -157,9 +156,7 @@ for t in note_files:
       elif beat == "75":
         beat = "0.75"
 
-
       output.append([note, pitch, beat])
-
 
   # load the image image, convert it to grayscalse
   template = cv2.imread(t, 0)
