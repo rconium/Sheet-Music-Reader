@@ -64,20 +64,20 @@ note_locations = {}
 
 # templates list
 note_files = [
-    "template/beam_a4_150_e4_quarter_d4_half.png",
+    "template/beam_a4_75_e4_quarter_d4_half.png",
     "template/beam_c4_75_d4_quarter_e4_half.png",
     "template/beam_c4_75_d4_25_e4_half.png",
-    "template/beam_a4_1half_b4_quarter_a4_half.png",
-    "template/beam_a4_150_b4_quarter_a4_half.png",
+    "template/beam_a4_75_b4_25_a4_half.png",
+    "template/beam_a4_75_b4_quarter_a4_half.png",
     "template/beam_d4_75_c4_quarter_d4_half.png",
 <<<<<<< HEAD
 =======
     "template/beam_c5_75_b4_25_c5_half.png",
-    "template/beam_c5_1half_b4_quarter_a4_half.png",
-    "template/beam_c5_150_b4_quarter_a4_half.png",
+    "template/beam_c5_75_b4_25_a4_half.png",
+    "template/beam_c5_75_b4_quarter_a4_half.png",
     "template/beam_c4_75_d4_25_e4_50.png",
     "template/beam_c4_75_d4_quarter_e4_50.png",
-    "template/beam_a4_150_e4_quarter_d4_50.png",
+    "template/beam_a4_75_e4_quarter_d4_50.png",
     "template/beam_d4_75_c4_quarter_d4_50.png",
     "template/beam_c5_75_b4_25_c5_50.png",
 >>>>>>> Tarek
@@ -288,8 +288,8 @@ for i in range(0, len(keys), 1):
   if i == 0:
     prev = note_locations[keys[i]]
   else:
-    prev.sort()
-    note_locations[keys[i]].sort()
+    # prev.sort()
+    # note_locations[keys[i]].sort()
 
     if prev == note_locations[keys[i]]:
       del note_locations[keys[i]]
