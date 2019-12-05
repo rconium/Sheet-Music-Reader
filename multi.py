@@ -9,6 +9,7 @@ import subprocess
 import os
 from midiutil.MidiFile3 import MIDIFile
 
+<<<<<<< HEAD
 note_defs = {
      "g5" : (79),
      "f5" : (77),
@@ -53,12 +54,33 @@ def sort_keyval(x):
     return (col*3) + x[0]
   else:
     return (col*4) + x[0]
+=======
+#list contains all the notes
+notesList = []
+
+#list contains all the notes locations
+note_locations = {}
+>>>>>>> Tarek
 
 # templates list
 note_files = [
-    "template/beam_c4_75_d4_quarter_e4_1.png",
-    "template/beam_a4_1half_b4_quarter_a4_1.png",
+    "template/beam_a4_150_e4_quarter_d4_half.png",
+    "template/beam_c4_75_d4_quarter_e4_half.png",
+    "template/beam_c4_75_d4_25_e4_half.png",
+    "template/beam_a4_1half_b4_quarter_a4_half.png",
+    "template/beam_a4_150_b4_quarter_a4_half.png",
     "template/beam_d4_75_c4_quarter_d4_half.png",
+<<<<<<< HEAD
+=======
+    "template/beam_c5_75_b4_25_c5_half.png",
+    "template/beam_c5_1half_b4_quarter_a4_half.png",
+    "template/beam_c5_150_b4_quarter_a4_half.png",
+    "template/beam_c4_75_d4_25_e4_50.png",
+    "template/beam_c4_75_d4_quarter_e4_50.png",
+    "template/beam_a4_150_e4_quarter_d4_50.png",
+    "template/beam_d4_75_c4_quarter_d4_50.png",
+    "template/beam_c5_75_b4_25_c5_50.png",
+>>>>>>> Tarek
     "template/b3_1.png",
     "template/c4_half.png",
     "template/d4_3.png",
@@ -71,6 +93,57 @@ note_files = [
     "template/c5_1half.png",
     "template/d5_1.png",]
 
+<<<<<<< HEAD
+=======
+# Notes types and pitch dictionary 
+note_defs = {
+     "g5" : (79),
+     "f5" : (77),
+     "e5" : (76),
+     "d5" : (74),
+     "c5" : (72),
+     "b4" : (71),
+     "a4" : (69),
+     "g4" : (67),
+     "f4" : (65),
+     "e4" : (64),
+     "d4" : (62),
+     "c4" : (60),
+     "b3" : (59),
+     "a3" : (57),
+     "g3" : (55),
+     "f3" : (53),
+     "e3" : (52),
+     "d3" : (50),
+     "c3" : (48),
+     "b2" : (47),
+     "a2" : (45),
+     "f2" : (53),
+}
+
+#----------------------------------------------------------------------------------------------------------#
+# Function:
+# open image files
+def open_file(path):
+  cmd = {'linux':'eog', 'win32':'explorer', 'darwin':'open'}[sys.platform]
+  subprocess.run([cmd, path])
+
+#----------------------------------------------------------------------------------------------------------#
+# Function: 
+# sorts coordinates from top left to bottom right.
+# uses the sections of each staves as reference to generate the 'location' of the note.
+def sort_keyval(x):
+  if (x[1] <= row/4):
+    return (col) + x[0]
+  elif (x[1] <= row/2):
+    return (col*2) + x[0]
+  elif (x[1] <= 3*row/4):
+    return (col*3) + x[0]
+  else:
+    return (col*4) + x[0]
+
+#----------------------------------------------------------------------------------------------------------#
+>>>>>>> Tarek
 # Function: Read take and return the input file
 def SelectFile(defaultFile):
     script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
@@ -89,32 +162,44 @@ def SelectFile(defaultFile):
             else:
                 return userInput
 
-# image being analyzed
+# read image from selected image
 image = cv2.imread(SelectFile("images/test.png"))
+
+# image being analyzed
 row, col = image.shape[:2]
 gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-note_locations = {}
+print("\nLoading.......\n")
 
+<<<<<<< HEAD
 print("\nLoading.......")
 
 for t in note_files:
   
+=======
+
+for t in note_files:
+>>>>>>> Tarek
   output = []
   # get note, pitch, and beat
   file_name = t.split("/")[1].split(".")[0]
   beam_check = file_name.split("_")
 
   if beam_check[0] != "beam":
+<<<<<<< HEAD
     note = file_name.split("_")[0][0]
     pitch = note_defs(file_name.split("_")[0][1])
+=======
+    note = beam_check[0]
+    pitch = note_defs[note]
+>>>>>>> Tarek
     beat = file_name.split("_")[1]
 
-    if beat == "half":
+    if beat == "half" or beat == "50":
       beat = "0.5"
-    elif beat == "1half":
+    elif beat == "1half" or beat == "150":
       beat = "1.5"
-    elif beat == "quarter":
+    elif beat == "quarter" or beat == "25":
       beat = "0.25"
     elif beat == "75":
       beat = "0.75"
@@ -124,15 +209,15 @@ for t in note_files:
   else:
     size = len(beam_check)
     for i in range(1, size, int((size-1)/3)):
-      note = beam_check[i][0]
-      pitch = beam_check[i][1]
+      note = beam_check[i]
+      pitch = note_defs[note]
       beat = beam_check[i + 1]
 
-      if beat == "half":
+      if beat == "half" or beat == "50":
         beat = "0.5"
-      elif beat == "1half":
+      elif beat == "1half" or beat == "150":
         beat = "1.5"
-      elif beat == "quarter":
+      elif beat == "quarter" or beat == "25":
         beat = "0.25"
       elif beat == "75":
         beat = "0.75"
@@ -184,14 +269,6 @@ for t in note_files:
     (endX, endY) = (int((x + tW) * r), int((y + tH) * r))
 
     # draw a bounding box around the detected result and display the image
-    # if (startY <= row/4):
-    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 255, 0), 2)
-    # elif (startY <= row/2):
-    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (0, 255, 255), 2)
-    # elif (startY <= 3*row/4):
-    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (255, 0, 255), 2)
-    # else:
-    #   image = cv2.rectangle(image, (startX, startY), (endX, endY), (255, 0, 0), 2)
     image = cv2.rectangle(image, (startX, startY), (endX, endY), (100, int(color[1]), int(color[2])), 2)
 
     cv2.putText(image, beam_check[0], (startX, startY), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,0,0), 2)
@@ -219,8 +296,10 @@ for i in range(0, len(keys), 1):
       continue
     else:
       prev = note_locations[keys[i]]
+
   #print(note_locations[keys[i]])
   outputFile.write(str(note_locations[keys[i]]) + "\n")
+  #make a list of all notes
   notesList.append(note_locations[keys[i]])
 
 
@@ -231,34 +310,65 @@ cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (0, 0, 255))
 # DEBUGGING: Show this certain box as yellow
 # image = cv2.rectangle(image, (keys[3][0], keys[3][1]), (keys[3][2], keys[3][3]), (0, 255, 255), 2)
 
+# create image file 
 cv2.imwrite("multi-result.png", image)
 open_file('multi-result.png')
 outputFile.close() 
 
+print("\nMaking midi music file.......\n")
+#----------------------------------------------------------------------------------------------------------#
+# Output the notes as midi file.
+
+# Create the MIDIFile Object with 1 track
 midi = MIDIFile(1)
-     
-track = 0   
+ 
+# the first track is 0, here we only need one
+track = 0  
 time = 0
 channel = 0
+
+# Use constant volume for all notes
 volume = 100
     
+# Add track name and tempo.
 midi.addTrackName(track, time, "Track")
 midi.addTempo(track, time, 140)
 
+# loop over notes and add the note
 for note in notesList:
+
+    #check if the note is beam
     if len(note) > 1:
-        print("beam -_- ")
+        for item in note:
+            #Get the duration time or beat and get the picth
+            duration = float(item[2])
+            pitch = int(item[1])
+
+            #add the note to midi object.
+            midi.addNote(track,channel,pitch,time,duration,volume)
+
+            #incremnt the time by duration time to add new note and play the notes in order  
+            time += duration
 
     else:
+        #Get the duration time or beat and get the picth
         duration = float(note[0][2])
         pitch = int(note[0][1])
+
+        #add the note to midi object.
         midi.addNote(track,channel,pitch,time,duration,volume)
+
+        #incremnt the time by duration time to add new note and play the notes in order  
         time += duration
 
 #insert sound with volume 0 after the music
 midi.addNote(track,channel,pitch,time,4,0)
 
-# And write it to disk.
+# Create midi music file
 binfile = open("music.mid", 'wb')
 midi.writeFile(binfile)
 binfile.close()
+<<<<<<< HEAD
+=======
+
+>>>>>>> Tarek
