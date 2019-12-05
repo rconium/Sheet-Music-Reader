@@ -207,7 +207,7 @@ for t in note_files:
     note_locations[(startX,startY,endX,endY)] = output
 # breakpoint()
 
-outputFile = open('notes.txt', "w")
+outputFile = open('results/notes.txt', "w")
 
 keys = list(note_locations.keys())
 
@@ -243,8 +243,8 @@ cv2.line(image, (0, int(3*row/4)) , (col, int(3*row/4)), (0, 0, 255))
 # image = cv2.rectangle(image, (keys[3][0], keys[3][1]), (keys[3][2], keys[3][3]), (0, 255, 255), 2)
 
 # create image file 
-cv2.imwrite("multi-result.png", image)
-open_file('multi-result.png')
+cv2.imwrite("results/marked_up_sheet.png", image)
+open_file('results/marked_up_sheet.png')
 outputFile.close() 
 
 print("\nMaking midi music file.......\n")
@@ -297,7 +297,7 @@ for note in notesList:
 midi.addNote(track,channel,pitch,time,4,0)
 
 # Create midi music file
-binfile = open("music.mid", 'wb')
+binfile = open("results/music.mid", 'wb')
 midi.writeFile(binfile)
 binfile.close()
 
