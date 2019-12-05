@@ -144,8 +144,8 @@ for t in note_files:
   else:
     size = len(beam_check)
     for i in range(1, size, int((size-1)/3)):
-      note = beam_check[i][0]
-      pitch = beam_check[i][1]
+      note = beam_check[i]
+      pitch = note_defs[note]
       beat = beam_check[i + 1]
 
       if beat == "half" or beat == "50":
@@ -274,7 +274,16 @@ for note in notesList:
 
     #check if the note is beam
     if len(note) > 1:
-        print("beam -_- ")
+        for item in note:
+            #Get the duration time or beat and get the picth
+            duration = float(item[2])
+            pitch = int(item[1])
+
+            #add the note to midi object.
+            midi.addNote(track,channel,pitch,time,duration,volume)
+
+            #incremnt the time by duration time to add new note and play the notes in order  
+            time += duration
 
     else:
         #Get the duration time or beat and get the picth
