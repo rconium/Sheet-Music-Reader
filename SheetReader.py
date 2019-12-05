@@ -12,7 +12,7 @@ from midiutil.MidiFile3 import MIDIFile
 #list contains all the notes
 notesList = []
 
-#list contains all the notes locations
+#dictionary contains all the notes information with the pixel coordinates as keys
 note_locations = {}
 
 # templates list
