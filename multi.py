@@ -9,58 +9,11 @@ import subprocess
 import os
 from midiutil.MidiFile3 import MIDIFile
 
-<<<<<<< HEAD
-note_defs = {
-     "g5" : (79),
-     "f5" : (77),
-     -2 : ("e5", 76),
-     -1 : ("d5", 74),
-      0 : ("c5", 72),
-      1 : ("b4", 71),
-      2 : ("a4", 69),
-      3 : ("g4", 67),
-      4 : ("f4", 65),
-      5 : ("e4", 64),
-      6 : ("d4", 62),
-      7 : ("c4", 60),
-      8 : ("b3", 59),
-      9 : ("a3", 57),
-     10 : ("g3", 55),
-     11 : ("f3", 53),
-     12 : ("e3", 52),
-     13 : ("d3", 50),
-     14 : ("c3", 48),
-     15 : ("b2", 47),
-     16 : ("a2", 45),
-     17 : ("f2", 53),
-
-}
-
-notesList = []
-
-# open image files
-def open_file(path):
-  cmd = {'linux':'eog', 'win32':'explorer', 'darwin':'open'}[sys.platform]
-  subprocess.run([cmd, path])
-
-# sorts coordinates from top left to bottom right.
-# uses the sections of each staves as reference to generate the 'location' of the note.
-def sort_keyval(x):
-  if (x[1] <= row/4):
-    return (col) + x[0]
-  elif (x[1] <= row/2):
-    return (col*2) + x[0]
-  elif (x[1] <= 3*row/4):
-    return (col*3) + x[0]
-  else:
-    return (col*4) + x[0]
-=======
 #list contains all the notes
 notesList = []
 
 #list contains all the notes locations
 note_locations = {}
->>>>>>> Tarek
 
 # templates list
 note_files = [
@@ -70,8 +23,6 @@ note_files = [
     "template/beam_a4_75_b4_25_a4_half.png",
     "template/beam_a4_75_b4_quarter_a4_half.png",
     "template/beam_d4_75_c4_quarter_d4_half.png",
-<<<<<<< HEAD
-=======
     "template/beam_c5_75_b4_25_c5_half.png",
     "template/beam_c5_75_b4_25_a4_half.png",
     "template/beam_c5_75_b4_quarter_a4_half.png",
@@ -80,7 +31,6 @@ note_files = [
     "template/beam_a4_75_e4_quarter_d4_50.png",
     "template/beam_d4_75_c4_quarter_d4_50.png",
     "template/beam_c5_75_b4_25_c5_50.png",
->>>>>>> Tarek
     "template/b3_1.png",
     "template/c4_half.png",
     "template/d4_3.png",
@@ -93,8 +43,6 @@ note_files = [
     "template/c5_1half.png",
     "template/d5_1.png",]
 
-<<<<<<< HEAD
-=======
 # Notes types and pitch dictionary 
 note_defs = {
      "g5" : (79),
@@ -143,7 +91,6 @@ def sort_keyval(x):
     return (col*4) + x[0]
 
 #----------------------------------------------------------------------------------------------------------#
->>>>>>> Tarek
 # Function: Read take and return the input file
 def SelectFile(defaultFile):
     script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
@@ -171,28 +118,16 @@ gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 print("\nLoading.......\n")
 
-<<<<<<< HEAD
-print("\nLoading.......")
 
 for t in note_files:
-  
-=======
-
-for t in note_files:
->>>>>>> Tarek
   output = []
   # get note, pitch, and beat
   file_name = t.split("/")[1].split(".")[0]
   beam_check = file_name.split("_")
 
   if beam_check[0] != "beam":
-<<<<<<< HEAD
-    note = file_name.split("_")[0][0]
-    pitch = note_defs(file_name.split("_")[0][1])
-=======
     note = beam_check[0]
     pitch = note_defs[note]
->>>>>>> Tarek
     beat = file_name.split("_")[1]
 
     if beat == "half" or beat == "50":
@@ -368,7 +303,3 @@ midi.addNote(track,channel,pitch,time,4,0)
 binfile = open("music.mid", 'wb')
 midi.writeFile(binfile)
 binfile.close()
-<<<<<<< HEAD
-=======
-
->>>>>>> Tarek
